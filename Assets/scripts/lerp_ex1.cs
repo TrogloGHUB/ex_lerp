@@ -5,12 +5,17 @@ using UnityEngine;
 public class lerp_ex1 : MonoBehaviour
 {
 
-    //public Vector3 destination;
+    // Variables pour le déplacement
     private Vector3 destination;
     public float vitesse;
     public float duree;
-
     private bool lerpActif=false;
+
+    // Variable pour la rotation
+    public Transform Target;
+    public float RotationSpeed;
+    private Quaternion _lookRotation;
+    private Vector3 _direction;
 
     void Start()
     {
@@ -29,9 +34,25 @@ public class lerp_ex1 : MonoBehaviour
             {
                 destination = hit.point;
                 lerpActif = true;
-                //StartCoroutine(MoveOverSpeed(gameObject, destination, vitesse));
-                StartCoroutine(MoveOverSeconds(gameObject, destination, duree));
+                
+                // DÉPLACEMENT
+                StartCoroutine(MoveOverSpeed(gameObject, destination, vitesse));
+                //StartCoroutine(MoveOverSeconds(gameObject, destination, duree));
             }
+        }
+
+
+        if (lerpActif)
+        {
+            // ROTATION
+            //find the vector pointing from our position to the target
+            _direction = (destination - transform.position).normalized;
+
+            //create the rotation we need to be in to look at the target
+            _lookRotation = Quaternion.LookRotation(_direction);
+
+            //rotate us over time according to speed until we are in the required rotation
+            transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * RotationSpeed);
         }
     }
 
@@ -60,4 +81,5 @@ public class lerp_ex1 : MonoBehaviour
         objectToMove.transform.position = end;
         lerpActif = false;
     }
+
 }
